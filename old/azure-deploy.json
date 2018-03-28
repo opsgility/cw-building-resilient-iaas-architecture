@@ -25,7 +25,7 @@
             }
         },
         "variables": {
-            "baseUri": "https://raw.githubusercontent.com/opsgility/",
+            "baseUri": "https://raw.githubusercontent.com/opsgility/cw-building-resilient-iaas-architecture/master/",
             "ADInstallScript":"https://raw.githubusercontent.com/opsgility/introduction-to-nested-templates/master/script-extensions/deploy-ad.ps1",
             "ADJoinScript":"https://raw.githubusercontent.com/opsgility/introduction-to-nested-templates/master/script-extensions/domain-join.ps1"
         },
