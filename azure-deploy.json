@@ -1,0 +1,162 @@
+    {
+        "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+        "contentVersion": "1.0.0.0",
+        "parameters": {
+            "adminUsername": {
+                "type": "string",
+                "defaultValue": "demouser",
+                "metadata": {
+                    "description": "The name of the administrator account of the new VM and domain"
+                }
+            },
+            "adminPassword": {
+                "type": "securestring",
+                "defaultValue": "demo@pass123",
+                "metadata": {
+                    "description": "The password for the administrator account of the new VM and domain"
+                }
+            },
+            "domainName": {
+                "type": "string",
+                "defaultValue": "litware.com",
+                "metadata": {
+                    "description": "The FQDN of the Active Directory Domain to be created"
+                }
+            }
+        },
+        "variables": {
+            "baseUri": "https://raw.githubusercontent.com/opsgility/cw-building-resilient-iaas-architecture/master/",
+            "ADInstallScript":"https://raw.githubusercontent.com/opsgility/introduction-to-nested-templates/master/script-extensions/deploy-ad.ps1",
+            "ADJoinScript":"https://raw.githubusercontent.com/opsgility/introduction-to-nested-templates/master/script-extensions/domain-join.ps1"
+        },
+        "resources": [
+            {
+                "name": "VirtualNetwork",
+                "type": "Microsoft.Resources/deployments",
+                "apiVersion": "2016-09-01",
+                "dependsOn": [],
+                "properties": {
+                    "mode": "Incremental",
+                    "templateLink": {
+                        "uri": "[concat(variables('baseUri'), '/', 'nested-templates/vnet.json')]",
+                        "contentVersion": "1.0.0.0"
+                    }
+                }
+            },
+            {
+                "name": "ActiveDirectory",
+                "type": "Microsoft.Resources/deployments",
+                "apiVersion": "2016-09-01",
+                "dependsOn": [
+                    "Microsoft.Resources/deployments/VirtualNetwork"
+                ],
+                "properties": {
+                    "mode": "Incremental",
+                    "templateLink": {
+                        "uri": "[concat(variables('baseUri'), '/', 'nested-templates/active-directory.json')]",
+                        "contentVersion": "1.0.0.0"
+                    },
+                    "parameters": {
+                        "adminUserName": {
+                            "value": "[parameters('adminUserName')]"
+                        },
+                        "adminPassword": {
+                            "value": "[parameters('adminPassword')]"
+                        },
+                        "domainName": {
+                            "value": "[parameters('domainName')]"
+                        },
+                        "adInstallScriptUrl": {
+                            "value": "[variables('ADInstallScript')]"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "VirtualNetworkWithDNS",
+                "type": "Microsoft.Resources/deployments",
+                "apiVersion": "2016-09-01",
+                "dependsOn": [
+                    "Microsoft.Resources/deployments/ActiveDirectory"
+                ],
+                "properties": {
+                    "mode": "Incremental",
+                    "templateLink": {
+                        "uri": "[concat(variables('baseUri'), '/', 'nested-templates/vnet-with-dns.json')]",
+                        "contentVersion": "1.0.0.0"
+                    }
+                }
+            },
+            {
+                "name": "MemberServer",
+                "type": "Microsoft.Resources/deployments",
+                "apiVersion": "2016-09-01",
+                "dependsOn": [
+                    "Microsoft.Resources/deployments/VirtualNetworkWithDNS"
+                ],
+                "properties": {
+                    "mode": "Incremental",
+                    "templateLink": {
+                        "uri": "[concat(variables('baseUri'), '/', 'nested-templates/member-server.json')]",
+                        "contentVersion": "1.0.0.0"
+                    },
+                    "parameters": {
+                        "adminUserName": {
+                            "value": "[parameters('adminUserName')]"
+                        },
+                        "adminPassword": {
+                            "value": "[parameters('adminPassword')]"
+                        },
+                        "domainName": {
+                            "value": "[parameters('domainName')]"
+                        },
+                        "DomainJoinscriptUrl": {
+                            "value": "[variables('ADJoinScript')]"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "SQLAO",
+                "type": "Microsoft.Resources/deployments",
+                "apiVersion": "2016-09-01",
+                "dependsOn": [
+                    "Microsoft.Resources/deployments/VirtualNetworkWithDNS"
+                ],
+                "properties": {
+                    "mode": "Incremental",
+                    "templateLink": {
+                        "uri": "[concat(variables('baseUri'), '/', 'nested-templates/sql-ao.json')]",
+                        "contentVersion": "1.0.0.0"
+                    },
+                    "parameters": {
+                        "adminUserName": {
+                            "value": "[parameters('adminUserName')]"
+                        },
+                        "adminPassword": {
+                            "value": "[parameters('adminPassword')]"
+                        },
+                        "existingDomainName": {
+                            "value": "[parameters('domainName')]"
+                        },
+                        "sqlServiceAccount": {
+                            "value": "sqladmin"
+                        },
+                        "sqlServicePassword": {
+                            "value": "[parameters('adminPassword')]"
+                        },
+                        "existingVirtualNetworkRGName":{
+                            "value":"[resourceGroup().name]"
+                        },
+                        "existingVirtualNetworkName":{
+                            "value": "OPSTrainingVNET"
+                        },
+                        "existingSubnetNames":{
+                            "value": "Data"
+                        }
+                    }
+                }
+            }
+        ],
+        "outputs": {}
+    }
