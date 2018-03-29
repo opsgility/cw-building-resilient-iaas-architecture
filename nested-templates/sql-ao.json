@@ -120,7 +120,7 @@
       "metadata": {
         "description": "Location of resources that the script is dependent on such as linked templates and DSC modules"
       },
-      "defaultValue": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/sql-alwayson-md-mult-subnets-zones"
+      "defaultValue": "https://raw.githubusercontent.com/opsgility/cw-building-resilient-iaas-architecture/master/nested-templates"
     },
     "_artifactsLocationSasToken": {
       "type": "securestring",
