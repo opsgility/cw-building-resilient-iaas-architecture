@@ -78,12 +78,9 @@
 
   },
   "variables": {
-    "VNETPrefix": "10.0.0.0/16",
-    "VNETSubnet1Name": "Web",
-    "VNETSubnet1Prefix": "10.0.0.0/24",
+    "VNETSubnet1Name": "Apps",
     "VNETSubnet2Name": "Data",
-    "VNETSubnet2Prefix": "10.0.1.0/24",
-    "VNETNAME": "CloudShopVNET",
+    "VNETNAME": "OPSTrainingVNET",
     "VnetID": "[resourceId('Microsoft.Network/virtualNetworks', variables('VNETNAME'))]",
     "CloudShopInstallScriptFileName": "deploy-cloudshop.ps1",
     "CloudShopInstallScriptParameters": "[concat(' -user ', parameters('adminUsername'), ' -password ', parameters('adminPassword'), ' -cloudshopurl ', parameters('CloudShopDownloadUrl'))]",
@@ -183,42 +180,6 @@
               "access": "Allow",
               "priority": 200,
               "direction": "Inbound"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "[variables('VNETNAME')]",
-      "type": "Microsoft.Network/virtualNetworks",
-      "location": "[resourceGroup().location]",
-      "apiVersion": "2016-03-30",
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/networkSecurityGroups', 'WebNetworkSecurityGroup')]"
-      ],
-      "tags": {
-        "displayName": "CloudShopVNET"
-      },
-      "properties": {
-        "addressSpace": {
-          "addressPrefixes": [
-            "[variables('VNETPrefix')]"
-          ]
-        },
-        "subnets": [
-          {
-            "name": "[variables('VNETSubnet1Name')]",
-            "properties": {
-              "addressPrefix": "[variables('VNETSubnet1Prefix')]",
-              "networkSecurityGroup": {
-                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'WebNetworkSecurityGroup')]"
-              }
-            }
-          },
-          {
-            "name": "[variables('VNETSubnet2Name')]",
-            "properties": {
-              "addressPrefix": "[variables('VNETSubnet2Prefix')]"
             }
           }
         ]

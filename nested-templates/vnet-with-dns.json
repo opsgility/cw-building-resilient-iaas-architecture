@@ -5,18 +5,14 @@
   },
   "variables": {
     "VNETNAME": "OPSTrainingVNET",
-    "DNSIP": "10.0.1.4",
+    "DNSIP": "10.0.2.4",
     "OPSTrainingVNETPrefix": "10.0.0.0/16",
     "OPSTrainingVNETSubnet1Name": "Apps",
     "OPSTrainingVNETSubnet1Prefix": "10.0.0.0/24",
+    "OPSTrainingVNETSubnet3Name": "Data",
+    "OPSTrainingVNETSubnet3Prefix": "10.0.1.0/24",
     "OPSTrainingVNETSubnet2Name": "Identity",
-    "OPSTrainingVNETSubnet2Prefix": "10.0.1.0/24",
-    "OPSTrainingVNETSubnet3Name": "sqlSubnet1",
-    "OPSTrainingVNETSubnet3Prefix": "10.0.2.0/24",
-    "OPSTrainingVNETSubnet4Name": "sqlSubnet2",
-    "OPSTrainingVNETSubnet4Prefix": "10.0.3.0/24",
-    "OPSTrainingVNETSubnet5Name": "sqlSubnet3",
-    "OPSTrainingVNETSubnet5Prefix": "10.0.4.0/24"
+    "OPSTrainingVNETSubnet2Prefix": "10.0.2.0/24"
   },
 
   "resources": [
@@ -57,18 +53,6 @@
             "name": "[variables('OPSTrainingVNETSubnet3Name')]",
             "properties": {
               "addressPrefix": "[variables('OPSTrainingVNETSubnet3Prefix')]"
-            }
-          },
-          {
-            "name": "[variables('OPSTrainingVNETSubnet4Name')]",
-            "properties": {
-              "addressPrefix": "[variables('OPSTrainingVNETSubnet4Prefix')]"
-            }
-          },
-          {
-            "name": "[variables('OPSTrainingVNETSubnet5Name')]",
-            "properties": {
-              "addressPrefix": "[variables('OPSTrainingVNETSubnet5Prefix')]"
             }
           }
         ]
