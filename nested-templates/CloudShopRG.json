@@ -28,28 +28,28 @@
       "metadata": {
         "description": "Zip that contains cloud shop sample"
       },
-      "defaultValue": "https://raw.githubusercontent.com/opsgility/lab-support-public/master/cloud-shop-no-dsc/CloudShop.zip"
+      "defaultValue": "https://cloudworkshop.blob.core.windows.net/building-resilient-iaas-architecture/CloudShop.zip"
     },
     "CloudShopDBDownloadUrl": {
       "type": "string",
       "metadata": {
         "description": "Zip that contains Adventure works DB sample"
       },
-      "defaultValue": "https://opsgilitylabs.blob.core.windows.net/public/AdventureWorks2012.bak"
+      "defaultValue": "https://cloudworkshop.blob.core.windows.net/building-resilient-iaas-architecture/AdventureWorks2012.bak"
     },
     "CloudShopInstallscriptUrl": {
       "type": "string",
       "metadata": {
         "description": "script to execute"
       },
-      "defaultValue": "https://raw.githubusercontent.com/opsgility/lab-support-public/master/cloud-shop-no-dsc/deploy-cloudshop.ps1"
+      "defaultValue": "https://raw.githubusercontent.com/opsgility/cw-building-resilient-iaas-architecture/master/script-extensions/deploy-cloudshop.ps1"
     },
     "CloudShopDBInstallscriptUrl": {
       "type": "string",
       "metadata": {
         "description": "script to execute"
       },
-      "defaultValue": "https://raw.githubusercontent.com/opsgility/lab-support-public/master/cloud-shop-single-web-server/deploy-cloudshop-db.ps1"
+      "defaultValue": "https://raw.githubusercontent.com/opsgility/cw-building-resilient-iaas-architecture/master/script-extensions/deploy-cloudshop-db.ps1"
     },
     "SQLConfigscriptUrl": {
       "type": "string",
