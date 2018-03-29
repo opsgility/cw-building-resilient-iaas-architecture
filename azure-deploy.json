@@ -150,9 +150,6 @@
                         },
                         "existingVirtualNetworkName":{
                             "value": "OPSTrainingVNET"
-                        },
-                        "existingSubnetNames":{
-                            "value": "Data"
                         }
                     }
                 }
