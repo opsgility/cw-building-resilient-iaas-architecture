@@ -191,7 +191,6 @@
       "location": "[resourceGroup().location]",
       "apiVersion": "2016-03-30",
       "dependsOn": [
-        "[resourceId('Microsoft.Network/virtualNetworks', variables('VNETNAME'))]",
         "[resourceId('Microsoft.Network/publicIPAddresses', variables('webipName'))]",
         "[concat('Microsoft.Network/loadBalancers/', parameters('lbName'))]"
       ],
@@ -302,8 +301,7 @@
       "location": "[resourceGroup().location]",
       "apiVersion": "2016-03-30",
       "dependsOn": [
-        "[resourceId('Microsoft.Network/publicIPAddresses', variables('SQLipName'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks', variables('VNETNAME'))]"
+        "[resourceId('Microsoft.Network/publicIPAddresses', variables('SQLipName'))]"
       ],
       "tags": {
         "displayName": "SQLNic"
