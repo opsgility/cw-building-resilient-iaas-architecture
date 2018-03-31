@@ -100,10 +100,7 @@
     "SQLNicName": "[concat(parameters('SQLVMName'), 'NetworkInterface')]",
     "scriptFolder": ".",
     "webipName": "webip",
-    "sqlipName": "sqlip",
-    "avsetname": "WebAVSet",
-    "WebVM-2StorageAccountContainerName": "vhds",
-    "publicIPAddressID": "[resourceId('Microsoft.Network/publicIPAddresses',variables('lbipName'))]",
+    "sqlipName": "sqlip"
 
   },
   "resources": [
@@ -127,8 +124,7 @@
       "location": "[resourceGroup().location]",
       "apiVersion": "2016-03-30",
       "dependsOn": [
-        "[resourceId('Microsoft.Network/publicIPAddresses', variables('webipName'))]",
-        "[concat('Microsoft.Network/loadBalancers/', parameters('lbName'))]"
+        "[resourceId('Microsoft.Network/publicIPAddresses', variables('webipName'))]"
       ],
       "tags": {
         "displayName": "WebNic"
