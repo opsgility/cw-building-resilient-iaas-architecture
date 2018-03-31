@@ -86,7 +86,6 @@
     "SQLSKU": "Web",
     "SQLImagePublisher": "MicrosoftSQLServer",
     "SQLImageOffer": "SQL2014SP2-WS2012R2",
-    "WebAvailabilitySetName": "WebAVSet",
     "WebOSDiskName": "WebOSDisk",
     "WebVM-2OSDiskName": "WebOSDisk2",
     "WebVmSize": "Standard_DS1_v2",
@@ -153,16 +152,12 @@
       "apiVersion": "2015-06-15",
       "dependsOn": [
         "[resourceId('Microsoft.Storage/storageAccounts', variables('vmstorageName'))]",
-        "[resourceId('Microsoft.Network/networkInterfaces', variables('WebNicName'))]",
-        "[concat('Microsoft.Compute/availabilitySets/', variables('WebAvailabilitySetName'))]"
+        "[resourceId('Microsoft.Network/networkInterfaces', variables('WebNicName'))]"
       ],
       "tags": {
         "displayName": "WebVM-1"
       },
       "properties": {
-        "availabilitySet": {
-          "id": "[resourceId('Microsoft.Compute/availabilitySets',variables('WebAvailabilitySetName'))]"
-        },
         "hardwareProfile": {
           "vmSize": "[variables('WebVmSize')]"
         },
