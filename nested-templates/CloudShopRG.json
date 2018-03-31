@@ -60,12 +60,12 @@
     },
     "WebVMName": {
       "type": "string",
-      "defaultValue": "WebVM-1",
+      "defaultValue": "CloudShopWeb",
       "minLength": 1
     },
     "SQLVMName": {
       "type": "string",
-      "defaultValue": "ContosoSQLSrv1",
+      "defaultValue": "CloudShopSQL",
       "minLength": 1
     },
     "lbName": {
@@ -107,7 +107,6 @@
     "SQLNicName": "[concat(parameters('SQLVMName'), 'NetworkInterface')]",
     "scriptFolder": ".",
     "webipName": "webip",
-    "webip2Name": "webip2",
     "lbipName": "cloushopip",
     "sqlipName": "sqlip",
     "avsetname": "WebAVSet",

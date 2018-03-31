@@ -88,39 +88,11 @@
                 }
             },
             {
-                "name": "MemberServer",
-                "type": "Microsoft.Resources/deployments",
-                "apiVersion": "2016-09-01",
-                "dependsOn": [
-                    "Microsoft.Resources/deployments/VirtualNetworkWithDNS"
-                ],
-                "properties": {
-                    "mode": "Incremental",
-                    "templateLink": {
-                        "uri": "[concat(variables('baseUri'), '/', 'nested-templates/member-server.json')]",
-                        "contentVersion": "1.0.0.0"
-                    },
-                    "parameters": {
-                        "adminUserName": {
-                            "value": "[parameters('adminUserName')]"
-                        },
-                        "adminPassword": {
-                            "value": "[parameters('adminPassword')]"
-                        },
-                        "domainName": {
-                            "value": "[parameters('domainName')]"
-                        },
-                        "DomainJoinscriptUrl": {
-                            "value": "[variables('ADJoinScript')]"
-                        }
-                    }
-                }
-            },
-            {
                 "name": "CloudShop",
                 "type": "Microsoft.Resources/deployments",
                 "apiVersion": "2016-09-01",
                 "dependsOn": [
+                    "Microsoft.Resources/deployments/VirtualNetwork"
                 ],
                 "properties": {
                     "mode": "Incremental",
