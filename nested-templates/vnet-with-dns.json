@@ -4,31 +4,31 @@
   "parameters": {
   },
   "variables": {
-    "VNETNAME": "OPSTrainingVNET",
+    "VNETNAME": "LitwareVNET",
     "DNSIP": "10.0.2.4",
-    "OPSTrainingVNETPrefix": "10.0.0.0/16",
-    "OPSTrainingVNETSubnet1Name": "Apps",
-    "OPSTrainingVNETSubnet1Prefix": "10.0.0.0/24",
-    "OPSTrainingVNETSubnet3Name": "Data",
-    "OPSTrainingVNETSubnet3Prefix": "10.0.1.0/24",
-    "OPSTrainingVNETSubnet2Name": "Identity",
-    "OPSTrainingVNETSubnet2Prefix": "10.0.2.0/24"
+    "LitwareVNETPrefix": "10.0.0.0/16",
+    "LitwareVNETSubnet1Name": "Apps",
+    "LitwareVNETSubnet1Prefix": "10.0.0.0/24",
+    "LitwareVNETSubnet3Name": "Data",
+    "LitwareVNETSubnet3Prefix": "10.0.1.0/24",
+    "LitwareVNETSubnet2Name": "Identity",
+    "LitwareVNETSubnet2Prefix": "10.0.2.0/24"
   },
 
   "resources": [
     {
-      "name": "OPSTrainingVNET",
+      "name": "LitwareVNET",
       "type": "Microsoft.Network/virtualNetworks",
       "location": "[resourceGroup().location]",
       "apiVersion": "2016-09-01",
       "dependsOn": [],
       "tags": {
-        "displayName": "OPSTrainingVNET"
+        "displayName": "LitwareVNET"
       },
       "properties": {
         "addressSpace": {
           "addressPrefixes": [
-            "[variables('OPSTrainingVNETPrefix')]"
+            "[variables('LitwareVNETPrefix')]"
           ]
         },
         "dhcpOptions": {
@@ -38,21 +38,21 @@
         },
         "subnets": [
           {
-            "name": "[variables('OPSTrainingVNETSubnet1Name')]",
+            "name": "[variables('LitwareVNETSubnet1Name')]",
             "properties": {
-              "addressPrefix": "[variables('OPSTrainingVNETSubnet1Prefix')]"
+              "addressPrefix": "[variables('LitwareVNETSubnet1Prefix')]"
             }
           },
           {
-            "name": "[variables('OPSTrainingVNETSubnet2Name')]",
+            "name": "[variables('LitwareVNETSubnet2Name')]",
             "properties": {
-              "addressPrefix": "[variables('OPSTrainingVNETSubnet2Prefix')]"
+              "addressPrefix": "[variables('LitwareVNETSubnet2Prefix')]"
             }
           },
           {
-            "name": "[variables('OPSTrainingVNETSubnet3Name')]",
+            "name": "[variables('LitwareVNETSubnet3Name')]",
             "properties": {
-              "addressPrefix": "[variables('OPSTrainingVNETSubnet3Prefix')]"
+              "addressPrefix": "[variables('LitwareVNETSubnet3Prefix')]"
             }
           }
         ]
