@@ -56,7 +56,7 @@
       "metadata": {
         "description": "script to execute"
       },
-      "defaultValue": "https://raw.githubusercontent.com/opsgility/lab-support-public/master/cloud-shop-single-web-server/configure-sql.ps1"
+      "defaultValue": "https://raw.githubusercontent.com/opsgility/cw-building-resilient-iaas-architecture/master/script-extensions/configure-sql.ps1"
     },
     "WebVMName": {
       "type": "string",
