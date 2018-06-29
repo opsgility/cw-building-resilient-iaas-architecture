@@ -18,7 +18,7 @@
             },
             "domainName": {
                 "type": "string",
-                "defaultValue": "litware.com",
+                "defaultValue": "contoso.com",
                 "metadata": {
                     "description": "The FQDN of the Active Directory Domain to be created"
                 }
