@@ -30,7 +30,7 @@
     },
     "domainName": {
       "type": "string",
-      "defaultValue": "opsaaddemo.local",
+      "defaultValue": "contoso.com",
       "metadata": {
         "description": "The FQDN of the Active Directory Domain to be created"
       }
@@ -65,7 +65,7 @@
     "ADVMImageOffer": "WindowsServer",
     "ADVMOSDiskName": "ADVMOSDisk",
     "ADVMVmSize": "Standard_DS1_v2",
-    "ADVMVnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'VNET')]",
+    "ADVMVnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'VNET1')]",
     "ADVMSubnetRef": "[concat(variables('ADVMVnetID'), '/subnets/', variables('VNETSubnet2Name'))]",
     "ADVMStorageAccountContainerName": "vhds",
     "ADVMNicName": "[concat(parameters('ADVMName'), 'NetworkInterface')]",
