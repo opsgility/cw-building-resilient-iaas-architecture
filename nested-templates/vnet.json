@@ -4,50 +4,50 @@
   "parameters": {
   },
   "variables": {
-    "VNETNAME": "LitwareVNET",
+    "VNETNAME": "VNET1",
     "DNSIP": "10.0.2.4",
-    "LitwareVNETPrefix": "10.0.0.0/16",
-    "LitwareVNETSubnet1Name": "Apps",
-    "LitwareVNETSubnet1Prefix": "10.0.0.0/24",
-    "LitwareVNETSubnet3Name": "Data",
-    "LitwareVNETSubnet3Prefix": "10.0.1.0/24",
-    "LitwareVNETSubnet2Name": "Identity",
-    "LitwareVNETSubnet2Prefix": "10.0.2.0/24"
+    "VNETPrefix": "10.0.0.0/16",
+    "VNETSubnet1Name": "Apps",
+    "VNETSubnet1Prefix": "10.0.0.0/24",
+    "VNETSubnet3Name": "Data",
+    "VNETSubnet3Prefix": "10.0.1.0/24",
+    "VNETSubnet2Name": "Identity",
+    "VNETSubnet2Prefix": "10.0.2.0/24"
   },
 
   "resources": [
     {
-      "name": "LitwareVNET",
+      "name": "VNET1",
       "type": "Microsoft.Network/virtualNetworks",
       "location": "[resourceGroup().location]",
       "apiVersion": "2016-03-30",
       "dependsOn": [],
       "tags": {
-        "displayName": "LitwareVNET"
+        "displayName": "VNET1"
       },
       "properties": {
         "addressSpace": {
           "addressPrefixes": [
-            "[variables('LitwareVNETPrefix')]"
+            "[variables('VNETPrefix')]"
           ]
         },
         "subnets": [
           {
-            "name": "[variables('LitwareVNETSubnet1Name')]",
+            "name": "[variables('VNETSubnet1Name')]",
             "properties": {
-              "addressPrefix": "[variables('LitwareVNETSubnet1Prefix')]"
+              "addressPrefix": "[variables('VNETSubnet1Prefix')]"
             }
           },
           {
-            "name": "[variables('LitwareVNETSubnet2Name')]",
+            "name": "[variables('VNETSubnet2Name')]",
             "properties": {
-              "addressPrefix": "[variables('LitwareVNETSubnet2Prefix')]"
+              "addressPrefix": "[variables('VNETSubnet2Prefix')]"
             }
           },
           {
-            "name": "[variables('LitwareVNETSubnet3Name')]",
+            "name": "[variables('VNETSubnet3Name')]",
             "properties": {
-              "addressPrefix": "[variables('LitwareVNETSubnet3Prefix')]"
+              "addressPrefix": "[variables('VNETSubnet3Prefix')]"
             }
           }
         ]

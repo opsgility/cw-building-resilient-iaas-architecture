@@ -73,7 +73,7 @@
   "variables": {
     "VNETSubnet1Name": "Apps",
     "VNETSubnet2Name": "Data",
-    "VNETNAME": "LitwareVNET",
+    "VNETNAME": "VNET1",
     "VnetID": "[resourceId('Microsoft.Network/virtualNetworks', variables('VNETNAME'))]",
     "CloudShopInstallScriptFileName": "deploy-cloudshop.ps1",
     "CloudShopInstallScriptParameters": "[concat(' -user ', parameters('adminUsername'), ' -password ', parameters('adminPassword'), ' -cloudshopurl ', parameters('CloudShopDownloadUrl'))]",
