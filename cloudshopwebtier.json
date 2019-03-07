@@ -1,0 +1,477 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vmstorageType": {
+            "defaultValue": "Premium_LRS",
+            "allowedValues": [
+                "Premium_LRS"
+            ],
+            "type": "String"
+        },
+        "subnetId": {
+            "type": "String"
+        },
+        "adminUsername": {
+            "defaultValue": "demouser",
+            "type": "String",
+            "metadata": {
+                "description": "The name of the administrator account of the new VM"
+            }
+        },
+        "adminPassword": {
+            "defaultValue": "demo@pass123",
+            "type": "SecureString",
+            "metadata": {
+                "description": "The password for the administrator account of the new VM and domain"
+            }
+        },
+        "CloudShopDownloadUrl": {
+            "defaultValue": "https://raw.githubusercontent.com/opsgility/lab-support-public/master/cloud-shop-no-dsc/CloudShop.zip",
+            "type": "String",
+            "metadata": {
+                "description": "Zip that contains cloud shop sample"
+            }
+        },
+        "CloudShopInstallscriptUrl": {
+            "defaultValue": "https://raw.githubusercontent.com/opsgility/lab-support-public/master/cloud-shop-no-dsc/deploy-cloudshop.ps1",
+            "type": "String",
+            "metadata": {
+                "description": "script to execute"
+            }
+        },
+        "WebVMName": {
+            "defaultValue": "WebVM-1",
+            "minLength": 1,
+            "type": "String"
+        },
+        "WebVMName2": {
+            "defaultValue": "WebVM-2",
+            "minLength": 1,
+            "type": "String"
+        },
+        "lbName": {
+            "defaultValue": "OPSLB",
+            "type": "String",
+            "metadata": {
+                "description": "Load Balancer name"
+            }
+        }
+    },
+    "variables": {
+        "CloudShopInstallScriptFileName": "deploy-cloudshop.ps1",
+        "CloudShopInstallScriptParameters": "[concat(' -user ', parameters('adminUsername'), ' -password ', parameters('adminPassword'), ' -cloudshopurl ', parameters('CloudShopDownloadUrl'))]",
+        "vmstorageName": "[concat('chqdisks', uniqueString(resourceGroup().id))]",
+        "WindowsOSVersion": "2016-Datacenter",
+        "WindowsImagePublisher": "MicrosoftWindowsServer",
+        "WindowsImageOffer": "WindowsServer",
+        "WebAvailabilitySetName": "WebAVSet",
+        "WebOSDiskName": "WebOSDisk",
+        "WebVM-2OSDiskName": "WebOSDisk2",
+        "WebVmSize": "Standard_D2S_v3",
+        "WebStorageAccountContainerName": "vhds",
+        "WebNicName": "[concat(parameters('WebVMName'), 'NetworkInterface')]",
+        "scriptFolder": ".",
+        "webipName": "webip",
+        "webip2Name": "webip2",
+        "lbipName": "cloushopip",
+        "avsetname": "WebAVSet",
+        "WebVM-2StorageAccountContainerName": "vhds",
+        "WebVM-2NicName": "[concat(parameters('WebVMName2'), 'NetworkInterface')]",
+        "publicIPAddressID": "[resourceId('Microsoft.Network/publicIPAddresses',variables('lbipName'))]",
+        "lbID": "[resourceId('Microsoft.Network/loadBalancers',parameters('lbName'))]",
+        "frontEndIPConfigID": "[concat(variables('lbID'),'/frontendIPConfigurations/LoadBalancerFrontEnd')]",
+        "lbPoolID": "[concat(variables('lbID'),'/backendAddressPools/BackendPool1')]",
+        "lbProbeID": "[concat(variables('lbID'),'/probes/httpProbe')]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Compute/availabilitySets",
+            "name": "[variables('avsetname')]",
+            "apiVersion": "2016-04-30-preview",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "WebAVSet"
+            },
+            "properties": {
+                "platformFaultDomainCount": "2",
+                "platformUpdateDomainCount": "2",
+                "managed": "false"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "sku": {
+                "name": "[parameters('vmstorageType')]"
+            },
+            "kind": "Storage",
+            "name": "[variables('vmstorageName')]",
+            "apiVersion": "2017-06-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "CloudShopStorage"
+            },
+            "dependsOn": []
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "name": "WebNetworkSecurityGroup",
+            "apiVersion": "2017-03-01",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "webrule",
+                        "properties": {
+                            "description": "This rule allows traffic in on port 80",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "80",
+                            "sourceAddressPrefix": "INTERNET",
+                            "destinationAddressPrefix": "10.0.0.0/24",
+                            "access": "Allow",
+                            "priority": 100,
+                            "direction": "Inbound"
+                        }
+                    },
+                    {
+                        "name": "rdprule",
+                        "properties": {
+                            "description": "This rule allows traffic on port 3389 from the web",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "3389",
+                            "sourceAddressPrefix": "INTERNET",
+                            "destinationAddressPrefix": "10.0.0.0/24",
+                            "access": "Allow",
+                            "priority": 200,
+                            "direction": "Inbound"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[variables('WebNicName')]",
+            "apiVersion": "2016-03-30",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "WebNic"
+            },
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[parameters('subnetID')]"
+                            },
+                            "loadBalancerBackendAddressPools": [
+                                {
+                                    "id": "[concat(variables('lbID'), '/backendAddressPools/BackendPool1')]"
+                                }
+                            ],
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('webipName'))]"
+                            }
+                        }
+                    }
+                ]
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', variables('webipName'))]",
+                "[concat('Microsoft.Network/loadBalancers/', parameters('lbName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[parameters('WebVMName')]",
+            "apiVersion": "2015-06-15",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "WebVM-1"
+            },
+            "properties": {
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets',variables('WebAvailabilitySetName'))]"
+                },
+                "hardwareProfile": {
+                    "vmSize": "[variables('WebVmSize')]"
+                },
+                "osProfile": {
+                    "computerName": "[parameters('WebVMName')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "[variables('WindowsImagePublisher')]",
+                        "offer": "[variables('WindowsImageOffer')]",
+                        "sku": "[variables('WindowsOSVersion')]",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "name": "WebOSDisk",
+                        "vhd": {
+                            "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('vmstorageName')), '2017-06-01').primaryEndpoints.blob, variables('WebStorageAccountContainerName'), '/', variables('WebOSDiskName'), '.vhd')]"
+                        },
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('WebNicName'))]"
+                        }
+                    ]
+                }
+            },
+            "resources": [
+                {
+                    "type": "extensions",
+                    "name": "InstallCloudShop",
+                    "apiVersion": "2016-03-30",
+                    "location": "[resourceGroup().location]",
+                    "tags": {
+                        "displayName": "InstallCloudShop"
+                    },
+                    "properties": {
+                        "publisher": "Microsoft.Compute",
+                        "type": "CustomScriptExtension",
+                        "typeHandlerVersion": "1.4",
+                        "autoUpgradeMinorVersion": true,
+                        "settings": {
+                            "fileUris": [
+                                "[concat(parameters('CloudShopInstallscriptUrl'))]"
+                            ],
+                            "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File ', variables('scriptFolder'), '/', variables('CloudShopInstallScriptFileName'), ' ', variables('CloudShopInstallScriptParameters'))]"
+                        }
+                    },
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Compute/virtualMachines', parameters('WebVMName'))]"
+                    ]
+                }
+            ],
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('vmstorageName'))]",
+                "[resourceId('Microsoft.Network/networkInterfaces', variables('WebNicName'))]",
+                "[concat('Microsoft.Compute/availabilitySets/', variables('WebAvailabilitySetName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('webipName')]",
+            "apiVersion": "2016-03-30",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "webip"
+            },
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic"
+            },
+            "dependsOn": []
+        },
+        {
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('webip2Name')]",
+            "apiVersion": "2016-03-30",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "webip2"
+            },
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic"
+            },
+            "dependsOn": []
+        },
+        {
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('lbipName')]",
+            "apiVersion": "2016-03-30",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "lbipName"
+            },
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic"
+            },
+            "dependsOn": []
+        },
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[variables('WebVM-2NicName')]",
+            "apiVersion": "2016-03-30",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "WebVM-2Nic"
+            },
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[parameters('subnetId')]"
+                            },
+                            "loadBalancerBackendAddressPools": [
+                                {
+                                    "id": "[concat(variables('lbID'), '/backendAddressPools/BackendPool1')]"
+                                }
+                            ],
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('webip2Name'))]"
+                            }
+                        }
+                    }
+                ]
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Network/loadBalancers/', parameters('lbName'))]",
+                "[resourceId('Microsoft.Network/publicIPAddresses', variables('webip2Name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[parameters('WebVMName2')]",
+            "apiVersion": "2015-06-15",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "WebVM-2"
+            },
+            "properties": {
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets',variables('WebAvailabilitySetName'))]"
+                },
+                "hardwareProfile": {
+                    "vmSize": "[variables('WebVmSize')]"
+                },
+                "osProfile": {
+                    "computerName": "[parameters('WebVMName2')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "[variables('WindowsImagePublisher')]",
+                        "offer": "[variables('WindowsImageOffer')]",
+                        "sku": "[variables('WindowsOSVersion')]",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "name": "WebVM-2OSDisk",
+                        "vhd": {
+                            "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('vmstorageName')), '2017-06-01').primaryEndpoints.blob, variables('WebVM-2StorageAccountContainerName'), '/', variables('WebVM-2OSDiskName'), '.vhd')]"
+                        },
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('WebVM-2NicName'))]"
+                        }
+                    ]
+                }
+            },
+            "resources": [
+                {
+                    "type": "extensions",
+                    "name": "InstallCloudShop",
+                    "apiVersion": "2016-03-30",
+                    "location": "[resourceGroup().location]",
+                    "tags": {
+                        "displayName": "InstallCloudShop"
+                    },
+                    "properties": {
+                        "publisher": "Microsoft.Compute",
+                        "type": "CustomScriptExtension",
+                        "typeHandlerVersion": "1.4",
+                        "autoUpgradeMinorVersion": false,
+                        "settings": {
+                            "fileUris": [
+                                "[concat(parameters('CloudShopInstallscriptUrl'))]"
+                            ],
+                            "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File ', variables('scriptFolder'), '/', variables('CloudShopInstallScriptFileName'), ' ', variables('CloudShopInstallScriptParameters'))]"
+                        }
+                    },
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Compute/virtualMachines', parameters('WebVMName2'))]"
+                    ]
+                }
+            ],
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('vmstorageName'))]",
+                "[resourceId('Microsoft.Network/networkInterfaces', variables('WebVM-2NicName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Network/loadBalancers",
+            "name": "[parameters('lbName')]",
+            "apiVersion": "2015-05-01-preview",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "OPSLB"
+            },
+            "properties": {
+                "frontendIPConfigurations": [
+                    {
+                        "name": "LoadBalancerFrontEnd",
+                        "properties": {
+                            "publicIPAddress": {
+                                "id": "[variables('publicIPAddressID')]"
+                            }
+
+                        }
+                    }
+                ],
+                "backendAddressPools": [
+                    {
+                        "name": "BackendPool1"
+                    }
+                ],
+                "loadBalancingRules": [
+                    {
+                        "name": "LBRule",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[variables('frontEndIPConfigID')]"
+                            },
+                            "backendAddressPool": {
+                                "id": "[variables('lbPoolID')]"
+                            },
+                            "protocol": "Tcp",
+                            "frontendPort": 80,
+                            "backendPort": 80,
+                            "enableFloatingIP": false,
+                            "idleTimeoutInMinutes": 5,
+                            "probe": {
+                                "id": "[variables('lbProbeID')]"
+                            }
+                        }
+                    }
+                ],
+                "probes": [
+                    {
+                        "name": "httpProbe",
+                        "properties": {
+                            "protocol": "Http",
+                            "port": 80,
+                            "intervalInSeconds": 5,
+                            "numberOfProbes": 2,
+                            "requestPath": "/"
+                        }
+                    }
+                ]
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Network/publicIPAddresses/', variables('lbipName'))]"
+            ]
+        }
+    ],
+    "outputs": {}
+}
