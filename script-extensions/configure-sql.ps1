@@ -16,11 +16,12 @@ Restart-Service -Name "MSSQLSERVER" -Force
 Invoke-Sqlcmd -ServerInstance Localhost -Database "master" -Query "ALTER LOGIN sa ENABLE" 
 Invoke-Sqlcmd -ServerInstance Localhost -Database "master" -Query "ALTER LOGIN sa WITH PASSWORD = 'demo@pass123'"
 
+$sqlServerSnapinVersion = (Get-Command Restore-SqlDatabase).ImplementingType.Assembly.GetName().Version.ToString()
+$assemblySqlServerSmoExtendedFullName = "Microsoft.SqlServer.SmoExtended, Version=$sqlServerSnapinVersion, Culture=neutral, PublicKeyToken=89845dcd8080cc91"
 
-$mdf = New-Object 'Microsoft.SqlServer.Management.Smo.RelocateFile, Microsoft.SqlServer.SmoExtended, Version=12.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91' -ArgumentList "AdventureWorks2012", "C:\Data\AdventureWorks2012.mdf"
-$ldf = New-Object 'Microsoft.SqlServer.Management.Smo.RelocateFile, Microsoft.SqlServer.SmoExtended, Version=12.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91' -ArgumentList "AdventureWorks2012_Log", "C:\Logs\AdventureWorks2012.ldf"
-
+$mdf = New-Object "Microsoft.SqlServer.Management.Smo.RelocateFile, $assemblySqlServerSmoExtendedFullName"('AdventureWorks2012', "C:\Data\AdventureWorks2012.mdf")
+$ldf = New-Object "Microsoft.SqlServer.Management.Smo.RelocateFile, $assemblySqlServerSmoExtendedFullName"('AdventureWorks2012_Log', "C:\Logs\AdventureWorks2012.ldf")
 
 # Restore the database from the backup
 Restore-SqlDatabase -ServerInstance Localhost -Database AdventureWorks `
-			-BackupFile $dbdestination -RelocateFile @($mdf,$ldf)  
+            -BackupFile $dbdestination -RelocateFile @($mdf,$ldf)  
