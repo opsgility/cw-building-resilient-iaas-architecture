@@ -64,7 +64,7 @@
     "ADVMImagePublisher": "MicrosoftWindowsServer",
     "ADVMImageOffer": "WindowsServer",
     "ADVMOSDiskName": "ADVMOSDisk",
-    "ADVMVmSize": "Standard_D2S_v3",
+    "ADVMVmSize": "Standard_D2s_v3",
     "ADVMVnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'VNET1')]",
     "ADVMSubnetRef": "[concat(variables('ADVMVnetID'), '/subnets/', variables('VNETSubnet2Name'))]",
     "ADVMStorageAccountContainerName": "vhds",
